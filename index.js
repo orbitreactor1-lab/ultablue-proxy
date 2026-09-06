@@ -7,19 +7,22 @@ const app = express();
 // Serve the static frontend assets from the public folder
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Securely proxy search engine traffic 
-app.use('/service', createProxyMiddleware({
+// Securely proxy search engine traffic dynamically based on paths
+app.use('/search', createProxyMiddleware({
     target: 'https://duckduckgo.com',
     changeOrigin: true,
     secure: true,
-    pathRewrite: {
-        '^/service': '', 
-    },
-    on: {
-        proxyRes: (proxyRes, req, res) => {
-            res.setHeader('Access-Control-Allow-Origin', '*');
-        }
-    }
+    pathRewrite: { '^/search': '' },
+    on: { proxyRes: (proxyRes, req, res) => res.setHeader('Access-Control-Allow-Origin', '*') }
+}));
+
+// Route for Wikipedia Lookup tab
+app.use('/wiki', createProxyMiddleware({
+    target: 'https://wikipedia.org',
+    changeOrigin: true,
+    secure: true,
+    pathRewrite: { '^/wiki': '/w/index.php' }, // Maps directly to Wikipedia's search engine handler
+    on: { proxyRes: (proxyRes, req, res) => res.setHeader('Access-Control-Allow-Origin', '*') }
 }));
 
 // Default port layout for Render environment
