@@ -3,16 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultablue Proxy</title>
+    <title>Ultablue Workspace</title>
     <style>
         body {
             margin: 0; padding: 0; background-color: #0b132b; color: #e0e1dd;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh;
         }
-        h1 { font-size: 3rem; color: #00b4d8; margin-bottom: 5px; font-weight: 800; letter-spacing: -1px; }
-        p { color: #8d99ae; margin-bottom: 30px; }
-        .search-container { width: 100%; max-width: 600px; display: flex; }
+        
+        /* Tab Bar Navigation Layout */
+        .tab-bar {
+            display: flex;
+            background-color: #1c2541;
+            border-bottom: 2px solid #1d3557;
+            padding: 5px 10px 0 10px;
+        }
+        .tab-button {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            color: #8d99ae;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px 6px 0 0;
+            margin-right: 5px;
+            transition: all 0.2s ease;
+        }
+        .tab-button:hover {
+            background-color: #2a375e;
+            color: #e0e1dd;
+        }
+        .tab-button.active {
+            background-color: #0b132b;
+            color: #00b4d8;
+            border: 1px solid #1d3557;
+            border-bottom: 1px solid #0b132b;
+        }
+
+        /* Container Viewports */
+        .tab-content {
+            display: none;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .tab-content.active {
+            display: block; /* Only visible when selected */
+        }
+
+        /* Search Elements */
+        .search-container { width: 100%; max-width: 600px; display: flex; margin: 20px auto; }
         input { flex: 1; padding: 15px 20px; border: 2px solid #1d3557; border-radius: 8px 0 0 8px; background-color: #1c2541; color: white; font-size: 16px; outline: none; }
         input:focus { border-color: #00b4d8; }
         button { padding: 15px 25px; background-color: #00b4d8; border: none; color: white; font-size: 16px; font-weight: bold; border-radius: 0 8px 8px 0; cursor: pointer; }
@@ -20,20 +59,56 @@
     </style>
 </head>
 <body>
-    <h1>Ultablue</h1>
-    <p>Blazing Fast Anonymous Web Search & Proxy</p>
-    <div class="search-container">
-        <input type="text" id="search-input" placeholder="Enter a search query..." autofocus>
-        <button onclick="launchProxy()">Go</button>
+
+    <!-- 1. The Navigation Tab Bar -->
+    <div class="tab-bar">
+        <button class="tab-button active" onclick="switchTab(event, 'search-view')">Search Home</button>
+        <button class="tab-button" onclick="switchTab(event, 'info-view')">About System</button>
+        <button class="tab-button" onclick="switchTab(event, 'settings-view')">Preferences</button>
     </div>
+
+    <!-- 2. Tab Content Views -->
+    <div id="search-view" class="tab-content active">
+        <h1>Ultablue</h1>
+        <p>Blazing Fast Anonymous Web Search</p>
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Enter a search query..." autofocus>
+            <button onclick="launchProxy()">Go</button>
+        </div>
+    </div>
+
+    <div id="info-view" class="tab-content">
+        <h1>System Information</h1>
+        <p>Ultablue is running securely as an isolated instance on a public cloud network node.</p>
+    </div>
+
+    <div id="settings-view" class="tab-content">
+        <h1>Preferences</h1>
+        <p>Adjust visual parameters or clean client-side localStorage variables here.</p>
+    </div>
+
+    <!-- 3. Client Side Tab Routing Logic -->
     <script>
+        function switchTab(event, tabId) {
+            // Hide all tab content panes
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+
+            // Deactivate all tab menu buttons
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => button.classList.remove('active'));
+
+            // Activate the specifically clicked tab element
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
         function launchProxy() {
             const input = document.getElementById('search-input').value.trim();
             if (!input) return;
-
-            // Route the web query cleanly through the /service path
             window.location.href = window.location.origin + '/service/html/?q=' + encodeURIComponent(input);
         }
+
         document.getElementById('search-input').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') launchProxy();
         });
